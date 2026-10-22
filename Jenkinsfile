@@ -1,17 +1,14 @@
-
 pipeline {
     agent any
 
-    tools {
-        jdk 'Java17'
-        maven 'Maven3'
-    }
-
     environment {
+        JAVA_HOME = '/usr/lib/jvm/java-21-amazon-corretto.x86_64'
+        PATH = "${JAVA_HOME}/bin:${PATH}"
         SONAR_HOST_URL = 'http://sonar.leancloudandevops.online:9000'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -28,15 +25,6 @@ pipeline {
         stage('Build and Test') {
             steps {
                 sh 'mvn -B clean verify'
-            }
-            post {
-                always {
-                    junit testResults: '**/target/surefire-reports/*.xml',
-                          allowEmptyResults: true
-
-                    archiveArtifacts artifacts: 'target/*.war',
-                                     allowEmptyArchive: true
-                }
             }
         }
 
@@ -73,7 +61,7 @@ pipeline {
         stage('Verify WAR') {
             steps {
                 sh '''
-                    test -s target/calculator.war
+                    test -f target/calculator.war
                     ls -lh target/calculator.war
                 '''
             }
@@ -83,7 +71,7 @@ pipeline {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'nexus-ponpandian',
+                        credentialsId: 'nexus-Ponpandian',
                         usernameVariable: 'NEXUS_USERNAME',
                         passwordVariable: 'NEXUS_PASSWORD'
                     )
@@ -105,8 +93,6 @@ pipeline {
 EOF
 
                         mvn -B -s "$WORKSPACE/.mvn-settings.xml" deploy
-
-                        rm -f "$WORKSPACE/.mvn-settings.xml"
                     '''
                 }
             }
@@ -116,23 +102,18 @@ EOF
     post {
         always {
             junit allowEmptyResults: true,
-                  testResults: '**/target/surefire-reports/*.xml'
+                  testResults: '*/target/surefire-reports/.xml'
 
             archiveArtifacts artifacts: 'target/*.war',
-                             fingerprint: true,
-                             allowEmptyArchive: true
+                             fingerprint: true
         }
 
         success {
-            echo 'Build, tests, SonarQube analysis, WAR verification, and deployment succeeded.'
+            echo 'Build, JUnit tests, WAR verification, and artifact archiving succeeded.'
         }
 
         failure {
             echo 'Pipeline failed. Review the Jenkins console output.'
-        }
-
-        cleanup {
-            sh 'rm -f "$WORKSPACE/.mvn-settings.xml"'
         }
     }
 }

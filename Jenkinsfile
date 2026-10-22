@@ -27,6 +27,17 @@ pipeline {
             }
         }
 
+            stage('Verify JaCoCo Report') {
+            steps {
+                sh '''
+                    test -s target/site/jacoco/jacoco.xml
+                    test -s target/site/jacoco/index.html
+                    echo "JaCoCo XML and HTML reports found."
+                '''
+            }
+        }
+ 
+
         stage('SonarQube Analysis') {
     steps {
         withCredentials([
@@ -40,8 +51,9 @@ pipeline {
                   -Dsonar.projectKey=DevOps-Calculator-Web-Ponpandian\
                   -Dsonar.projectName="DevOps Calculator Web - Ponpandian" \
                   -Dsonar.host.url="$SONAR_HOST_URL" \
-                  -Dsonar.token="$SONAR_TOKEN"
-            '''
+                  -Dsonar.token="$SONAR_TOKEN" \
+                  -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+             '''
         }
     }
 }

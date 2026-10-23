@@ -76,7 +76,7 @@ pipeline {
                         passwordVariable: 'NEXUS_PASSWORD'
                     )
                 ]) {
-                    sh 'mvn -s .mvn-settings.xml deploy'
+                    sh '''
                         set +x
                         umask 077
 

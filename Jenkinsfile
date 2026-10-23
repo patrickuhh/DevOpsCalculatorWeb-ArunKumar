@@ -49,7 +49,7 @@ stage('SonarQube Analysis') {
                 )
             ]) {
                 sh '''
-                    mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                    mvn -e -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                       -Dsonar.projectKey=DevOps-Calculator-Web-Ponpandian \
                       -Dsonar.projectName="DevOps Calculator Web - Ponpandian" \
                       -Dsonar.host.url="$SONAR_HOST_URL" \

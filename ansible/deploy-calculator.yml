@@ -12,7 +12,7 @@
     nexus_base_url: "http://nexus.leancloudandevops.online:8081"
     nexus_repository: "maven-releases"
     artifact_group_path: "com/example"
-    artifact_id: "DevOpsCalculatorWeb-Lakshmanan"
+    artifact_id: "DevOpsCalculatorWeb-Arunkumar"
     artifact_version: "1.0.0"
     artifact_file: "{{ artifact_id }}-{{ artifact_version }}.war"
     artifact_url: "{{ nexus_base_url }}/repository/{{ nexus_repository }}/{{ artifact_group_path }}/{{ artifact_id }}/{{ artifact_version }}/{{ artifact_file }}"

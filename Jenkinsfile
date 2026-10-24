@@ -111,6 +111,9 @@ EOF
                 }
             }
         }
+
+
+
         stage('Provision Tomcat Server via Ansible') {
     steps {
         withCredentials([
@@ -142,9 +145,8 @@ EOF
         }
     }
 }
-    }
 
-    stage('Deploy to Tomcat via Ansible') {
+stage('Deploy to Tomcat via Ansible') {
     steps {
         withCredentials([
             sshUserPrivateKey(
@@ -189,6 +191,10 @@ EOF
         }
     }
 }
+
+    }
+
+    
 
 
     post {

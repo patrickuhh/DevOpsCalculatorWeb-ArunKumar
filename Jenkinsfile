@@ -206,12 +206,23 @@ stage('Deploy to Tomcat via Ansible') {
                              fingerprint: true
         }
 
-        success {
-            echo 'Build, JUnit tests, WAR verification, and artifact archiving succeeded.'
-        }
+          success {
+        slackSend(
+            channel: '#devops-builds',
+            color: 'good',
+            message: """SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}
+Build URL: ${env.BUILD_URL}"""
+        )
+    }
 
-        failure {
-            echo 'Pipeline failed. Review the Jenkins console output.'
-        }
+    failure {
+        slackSend(
+            channel: '#devops-builds-',
+            color: 'danger',
+            message: """FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}
+Build URL: ${env.BUILD_URL}
+Please check the Jenkins console output."""
+        )
+    }
     }
 }

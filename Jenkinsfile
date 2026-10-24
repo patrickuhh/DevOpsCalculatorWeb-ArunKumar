@@ -111,7 +111,85 @@ EOF
                 }
             }
         }
+        stage('Provision Tomcat Server via Ansible') {
+    steps {
+        withCredentials([
+            sshUserPrivateKey(
+                credentialsId: 'ansible-target-ssh-student',
+                keyFileVariable: 'ANSIBLE_SSH_KEY',
+                usernameVariable: 'ANSIBLE_SSH_USER'
+            )
+        ]) {
+            sh '''
+                set -eu
+                export ANSIBLE_CONFIG="$WORKSPACE/ansible/ansible.cfg"
+                INVENTORY="$WORKSPACE/ansible/inventory.ini"
+
+                ansible calculator -i "$INVENTORY" -m ping \
+                    --private-key="$ANSIBLE_SSH_KEY" \
+                    -e "ansible_user=$ANSIBLE_SSH_USER"
+
+                ansible-playbook -i "$INVENTORY" \
+                    "$WORKSPACE/ansible/install-java.yml" \
+                    --private-key="$ANSIBLE_SSH_KEY" \
+                    -e "ansible_user=$ANSIBLE_SSH_USER"
+
+                ansible-playbook -i "$INVENTORY" \
+                    "$WORKSPACE/ansible/install-tomcat.yml" \
+                    --private-key="$ANSIBLE_SSH_KEY" \
+                    -e "ansible_user=$ANSIBLE_SSH_USER"
+            '''
+        }
     }
+}
+    }
+
+    stage('Deploy to Tomcat via Ansible') {
+    steps {
+        withCredentials([
+            sshUserPrivateKey(
+                credentialsId: 'ansible-target-ssh-student',
+                keyFileVariable: 'ANSIBLE_SSH_KEY',
+                usernameVariable: 'ANSIBLE_SSH_USER'
+            ),
+            string(
+                credentialsId: 'ansible-vault-password',
+                variable: 'ANSIBLE_VAULT_PASSWORD'
+            )
+        ]) {
+            sh '''
+                set +x
+                set -eu
+                export ANSIBLE_CONFIG="$WORKSPACE/ansible/ansible.cfg"
+                INVENTORY="$WORKSPACE/ansible/inventory.ini"
+                PLAYBOOK="$WORKSPACE/ansible/deploy-calculator.yml"
+
+                APP_VERSION="$(mvn -q -DforceStdout \
+                    help:evaluate -Dexpression=project.version)"
+                test -n "$APP_VERSION"
+                test -r "$ANSIBLE_SSH_KEY"
+                ssh-keygen -y -f "$ANSIBLE_SSH_KEY" >/dev/null
+
+                ansible calculator -i "$INVENTORY" -m ping \
+                    --private-key="$ANSIBLE_SSH_KEY" \
+                    -e "ansible_user=$ANSIBLE_SSH_USER"
+
+                VAULT_PASS_FILE="$(mktemp)"
+                trap 'rm -f "$VAULT_PASS_FILE"' EXIT
+                chmod 600 "$VAULT_PASS_FILE"
+                printf '%s' "$ANSIBLE_VAULT_PASSWORD" > "$VAULT_PASS_FILE"
+                unset ANSIBLE_VAULT_PASSWORD
+
+                ansible-playbook -i "$INVENTORY" "$PLAYBOOK" \
+                    --vault-password-file "$VAULT_PASS_FILE" \
+                    --private-key="$ANSIBLE_SSH_KEY" \
+                    -e "ansible_user=$ANSIBLE_SSH_USER" \
+                    -e "artifact_version=$APP_VERSION"
+            '''
+        }
+    }
+}
+
 
     post {
         always {

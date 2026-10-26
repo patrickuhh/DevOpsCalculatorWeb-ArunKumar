@@ -21,8 +21,8 @@
   tasks:
     - name: Download WAR from authenticated Nexus repository
       ansible.builtin.get_url:
-        url: "{{ nexus_war_url }}"
-        dest: /tmp/calculator.war
+        url: "{{ artifact_url }}"
+        dest: "{{ download_path }}"
         url_username: "{{ nexus_username }}"
         url_password: "{{ nexus_password }}"
         force_basic_auth: true

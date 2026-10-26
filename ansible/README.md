@@ -78,3 +78,4 @@ The Jenkins pipeline should run the Ansible playbooks from the `ansible` folder 
 - [ ] Changes are committed and pushed to GitHub.
 
 Once these checks are complete, run the Jenkins pipeline and review the console output if a stage fails.
+victor

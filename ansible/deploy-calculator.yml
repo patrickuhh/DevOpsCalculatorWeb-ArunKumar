@@ -1,4 +1,3 @@
-
 ---
 - name: Deploy Calculator Web application to Tomcat
   hosts: calculator

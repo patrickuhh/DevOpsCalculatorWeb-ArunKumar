@@ -1,3 +1,4 @@
+
 ---
 - name: Deploy Calculator Web application to Tomcat
   hosts: calculator
@@ -9,17 +10,18 @@
 
   vars:
     tomcat_home: /opt/tomcat
-    nexus_base_url: "http://3.235.43.239:8081/"
+    nexus_base_url: "http://3.235.43.239:8081"
     nexus_repository: "maven-releases"
     artifact_group_path: "com/example"
     artifact_id: "DevOpsCalculatorWeb-ArunKumar"
     artifact_version: "1.0.0"
+
     artifact_file: "{{ artifact_id }}-{{ artifact_version }}.war"
     artifact_url: "{{ nexus_base_url }}/repository/{{ nexus_repository }}/{{ artifact_group_path }}/{{ artifact_id }}/{{ artifact_version }}/{{ artifact_file }}"
     download_path: "/tmp/{{ artifact_file }}"
 
   tasks:
-    - name: Download WAR from authenticated Nexus repository
+    - name: Download WAR from Nexus
       ansible.builtin.get_url:
         url: "{{ artifact_url }}"
         dest: "{{ download_path }}"
@@ -29,7 +31,19 @@
         mode: "0644"
       no_log: true
 
-    - name: Stop Tomcat before deployment
+    - name: Verify downloaded WAR file
+      ansible.builtin.stat:
+        path: "{{ download_path }}"
+      register: war_file
+
+    - name: Validate WAR file
+      ansible.builtin.assert:
+        that:
+          - war_file.stat.exists
+          - war_file.stat.size | int > 0
+        fail_msg: "WAR file is missing or empty."
+
+    - name: Stop Tomcat
       ansible.builtin.systemd:
         name: tomcat
         state: stopped

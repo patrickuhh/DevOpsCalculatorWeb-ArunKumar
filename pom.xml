@@ -40,7 +40,7 @@
     <repository>
         <id>nexus-releases</id>
         <name>Nexus Maven Releases</name>
-        <url>http://nexus.leancloudandevops.online:8081/repository/maven-releases/</url>
+        <url>http://3.235.43.239:8081/repository/maven-releases/</url>
     </repository>
 </distributionManagement>
 

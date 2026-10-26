@@ -4,7 +4,7 @@ pipeline {
     environment {
         JAVA_HOME = '/usr/lib/jvm/java-21-amazon-corretto.x86_64'
         PATH = "${JAVA_HOME}/bin:${PATH}"
-        SONAR_HOST_URL = 'http://sonar.leancloudandevops.online:9000'
+        SONAR_HOST_URL = 'http://3.235.43.239:9000/'
     }
 
     stages {
@@ -85,7 +85,7 @@ stage('SonarQube Analysis') {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'nexus-Ponpandian',
+                        credentialsId: 'nexsus-user',
                         usernameVariable: 'NEXUS_USERNAME',
                         passwordVariable: 'NEXUS_PASSWORD'
                     )

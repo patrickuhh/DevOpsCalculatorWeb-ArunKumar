@@ -117,7 +117,7 @@ stage('Build Docker Image') {
         script {
             env.AWS_REGION = 'us-east-1'
             env.AWS_ACCOUNT_ID = '529470779933'
-            env.ECR_REPOSITORY = 'calculator-web'
+            env.ECR_REPOSITORY = 'student-web'
             env.ECR_REGISTRY = "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
             env.IMAGE_TAG = "build-${env.BUILD_NUMBER}"
             env.ECR_IMAGE = "${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}"

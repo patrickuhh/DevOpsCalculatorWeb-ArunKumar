@@ -111,12 +111,13 @@ EOF
                 }
             }
         }
-        stage('Build Docker Image') {
+        
+stage('Build Docker Image') {
     steps {
         script {
-            env.AWS_REGION = 'us-east-1'          // Replace
-            env.AWS_ACCOUNT_ID = '529470779933'    // Replace
-            env.ECR_REPOSITORY = '= 529470779933'  // Replace
+            env.AWS_REGION = 'us-east-1'
+            env.AWS_ACCOUNT_ID = '529470779933'
+            env.ECR_REPOSITORY = 'calculator-web'
             env.ECR_REGISTRY = "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
             env.IMAGE_TAG = "build-${env.BUILD_NUMBER}"
             env.ECR_IMAGE = "${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}"
@@ -149,6 +150,7 @@ stage('Push Docker Image to ECR') {
         '''
     }
 }
+
 
     stage('Provision Tomcat Server via Ansible') {
     steps {
